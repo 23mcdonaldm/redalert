@@ -1,0 +1,152 @@
+/* Size for brand */
+nav .navbar-brand
+{
+    font-size: xx-large;
+}
+
+/* Colors for brand */
+nav .navbar-brand .blue
+{
+    color: #537fbe;
+}
+nav .navbar-brand .red
+{
+    color: #ea433b;
+}
+nav .navbar-brand .yellow
+{
+    color: #f5b82e;
+}
+nav .navbar-brand .green
+{
+    color: #2e944b;
+}
+
+nav .navbar-brand .black
+{
+    color: #000000;
+}
+
+/* Custom styles for the registration form */
+.registration {
+    max-width: 600px;
+    margin: auto;
+    background-color: #f8f9fa;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.registration .form-label {
+    font-weight: bold;
+}
+
+.registration .form-check-label {
+    margin-left: 5px;
+}
+
+.registration .form-control {
+    margin-top: 5px;
+    margin-bottom: 15px;
+}
+
+.registration .btn {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+}
+
+.hidden {
+    display: none;
+}
+
+.specific {
+    margin: 20px;
+}
+
+/* Size for brand */
+nav .navbar-brand
+{
+    font-size: xx-large;
+}
+
+/* Colors for brand */
+nav .navbar-brand .blue
+{
+    color: #537fbe;
+}
+nav .navbar-brand .red
+{
+    color: #ea433b;
+}
+nav .navbar-brand .yellow
+{
+    color: #f5b82e;
+}
+nav .navbar-brand .green
+{
+    color: #2e944b;
+}
+
+nav .navbar-brand .black
+{
+    color: #000000;
+}
+
+/* Custom styles for the registration form */
+.registration {
+    max-width: 600px;
+    margin: auto;
+    background-color: #f8f9fa;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.registration .form-label {
+    font-weight: bold;
+}
+
+.registration .form-check-label {
+    margin-left: 5px;
+}
+
+.registration .form-control {
+    margin-top: 5px;
+    margin-bottom: 15px;
+}
+
+.registration .btn {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+}
+
+#map {
+    margin-left: 10%;
+    margin-right: 10%;
+    height: 70%;
+    width: 70%;
+  }
+  
+  /* 
+   * Optional: Makes the sample page fill the window. 
+   */
+  html,
+  body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  .custom-map-control-button {
+    background-color: #fff;
+    border: 0;
+    border-radius: 2px;
+    box-shadow: 0 1px 4px -1px rgba(0, 0, 0, 0.3);
+    margin: 10px;
+    padding: 0 0.5em;
+    font: 400 18px Roboto, Arial, sans-serif;
+    overflow: hidden;
+    height: 40px;
+    cursor: pointer;
+  }
+  .custom-map-control-button:hover {
+    background: rgb(235, 235, 235);
+  }

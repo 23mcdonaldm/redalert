@@ -1,3 +1,2 @@
 # hcd-ids
-a project for hcd
-we will get an A
+Hello World. This is formally my introduction and were headed to the top
