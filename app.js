@@ -33,7 +33,6 @@ app.use(authRoutes);
 
 app.use(mapRoutes);
 
-
 //doesn't match any above routes, 404s
 app.use((req, res) => {
     res.status(404).render('404');

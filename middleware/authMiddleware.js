@@ -11,7 +11,7 @@ const requireAuth = (req, res, next) => {
                 console.log(err.message);
                 res.redirect('/login');
             } else {
-                console.log(decodedToken);
+                //console.log(decodedToken);
                 next();
             }
         })
@@ -32,7 +32,7 @@ const requireAdminAuth = (req, res, next) => {
                 console.error("Do not have administrator privilege: " + err);
                 res.redirect('/');
             } else {
-                console.log(decodedToken);
+                //console.log(decodedToken);
                 next();
             }
         })
@@ -42,6 +42,8 @@ const requireAdminAuth = (req, res, next) => {
 }
 
 
+
+//front end, passed from middleware to the views rendered
 const checkUser = (req, res, next) => {
     const token = req.cookies.jwt
     if(token) {
@@ -51,7 +53,7 @@ const checkUser = (req, res, next) => {
                 res.locals.user = null;
                 next();
             } else {
-                console.log(decodedToken);
+                //console.log(decodedToken);
                 let insertQuery = `SELECT * FROM person WHERE person_uid = '${decodedToken.user_uid}'`;
                 let user = await pool.query(insertQuery);
                 res.locals.user = user.rows[0];

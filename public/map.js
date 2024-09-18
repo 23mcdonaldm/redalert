@@ -6,6 +6,43 @@ let PinElement;
 let dataOutput = document.getElementById("data");
 let currLocationMarker;
 
+//getting userData for backend
+async function fetchUserTok() {
+    try {
+        const response = await fetch('/getUserTok');
+
+        if(!response.ok) {
+            throw new Error('Error getting user cookie data');
+        }
+        const data = await response.json();
+        console.log('User data: ', data);
+
+        return data;
+    } catch (err) {
+        console.error('Failed to fetch data');
+        return null;
+    }
+}
+
+async function fetchUserData(user_uid) {
+    try {
+        const response = await fetch(`/fetchUserData/${user_uid}`);
+        if(!response.ok) {
+            throw new Error('Error getting user details');
+        }
+        const user = await response.json();
+        return user;
+    } catch (err) {
+        console.error('Failed to fetch user details', err);
+        return null;
+    }
+}
+//gets user token and then gets the full user object from here
+const curr_user_tok = await fetchUserTok();
+const curr_user = await fetchUserData(curr_user_tok.user_uid);
+
+
+
 async function initMap() {
   // The location of Uluru
   const position = { lat: 0, lng: 0 };
@@ -35,18 +72,24 @@ async function initMap() {
     position: position,
     title: "Uluru",
   });
+  
+  if(curr_user.user_type == 'student') {
 
+  
   const locationButton = document.createElement("button");
 
   locationButton.textContent = "Mark My Location";
   locationButton.classList.add("custom-map-control-button");
   map.controls[google.maps.ControlPosition.TOP_CENTER].push(locationButton);
 
-  locationButton.addEventListener("click", () => {
-    console.log("finding location");
-    findMyCoordinates();
+    locationButton.addEventListener("click", () => {
+        console.log("finding location");
+        findMyCoordinates();
     
-});
+    });
+
+}
+
 
 }
 
@@ -58,13 +101,33 @@ function findMyCoordinates() {
     if(navigator.geolocation) {
         console.log("location found");
         navigator.geolocation.getCurrentPosition(
-            (position) => {
+            async (position) => {
                 const pos = {
                     lat: position.coords.latitude,
                     lng: position.coords.longitude
                 };
-
                 console.log(pos);
+                const status = 'Safe';
+                try {
+                    const curr_latitude = pos.lat;
+                    const curr_longitude = pos.lng;
+                    const posInput = 'Point(' + curr_latitude + ' ' + curr_longitude + ')';
+                    console.log('starting with ' + posInput);
+                    const response = await fetch('/mapUserCoordinates', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            posInput,
+                            curr_user,
+                            status
+                        }),
+                    });
+                } catch (err) {
+                    console.error('Error sending location data:', err);
+                }
+                
                 dataOutput.innerText = `User Location Data\n{\nLatitude: ${pos.lat}\nLongitude: ${pos.lng}\n}`;
                 //infoWindow.setPosition(pos);
                 //infoWindow.open(map);
@@ -103,6 +166,10 @@ function findMyCoordinates() {
     
 }
 
+
+function markCoordinates(pos) {
+    
+}
 /*
 currLocationMarker.addEventListener("click", ({ domEvent, latLng }) => {
     const { target } = domEvent;

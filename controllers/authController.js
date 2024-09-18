@@ -36,7 +36,6 @@ module.exports.login_post = async (req, res) => {
     try {
         const logged_in_user = await login(user);
         const user_token = createToken(logged_in_user);
-        console.log(user_token);
         res.cookie('jwt', user_token, { maxAge: maxAge * 1000}); //add in secure requirement eventually
         res.status(200).json({ message: "User has logged in!" });
     } catch (err) {
@@ -129,7 +128,7 @@ async function registerUser(user, res) {
                                             (SELECT school_uid FROM school WHERE name = '${user.school_name}'))`;
                 break;
     
-            case 'admin':
+            case 'administrator':
                 insertQuery = `INSERT INTO administrator(person_uid, name, username, pwhash, phone_number, email, position, user_type, school_uid) VALUES 
                                             (uuid_generate_v4(), '${user.fullName}', '${user.username}', '${user.password}', '${user.phone_number}', '${user.email}', '${user.position}', '${user.user_type}',
                                             (SELECT school_uid FROM school WHERE name = '${user.school_name}'))`
@@ -161,7 +160,7 @@ function addUserSpecificAttributes(user, req) {
                 user = { ...user, affiliation, affiliated_student_name };
                 break;
     
-            case 'admin':
+            case 'administrator':
                 const { position } = req.body;
                 user = { ...user, position}; 
                 break;
@@ -199,7 +198,38 @@ module.exports.check_username = async (req, res) => {
     }
 }
 
+//backend
+module.exports.getUserTok = (req, res) => {
+    const token = req.cookies.jwt;
 
+    if(token) {
+        jwt.verify(token, process.env.JWT_SECRET, (err, decodedToken) => {
+            if(err) {
+                return res.status(403).json({ error: 'Token invalid' });
+            } else {
+                res.json({ user_uid: decodedToken.user_uid, user_type: decodedToken.user_type });
+            }
+        });
+    } else {
+        return res.status(401).json({ error: 'No token available' });
+    }
+}
+
+
+module.exports.getUserData = async (req, res) => {
+    const { user_uid } = req.params;
+    
+    try {
+        const result = await pool.query(`SELECT * FROM person WHERE person_uid = '${user_uid}'`);
+        if( result.rows.length > 0) {
+            res.json(result.rows[0]);
+        } else {
+            res.status(404).json({ error: 'User not found' });
+        }
+    } catch (err) {
+        res.status(500).json({ error: 'Database query failed' });
+    }
+}
 
 
 
