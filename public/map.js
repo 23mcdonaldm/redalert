@@ -181,15 +181,7 @@ async function userList() {
 
 }
 
-/*
-currLocationMarker.addEventListener("click", ({ domEvent, latLng }) => {
-    const { target } = domEvent;
 
-    infoWindow.close();
-    infoWindow.setContent(marker.title);
-    infoWindow.open(marker.map, marker);
-});
-*/
 
 const directions = Object.freeze({
     North: 0,
@@ -255,20 +247,3 @@ function calculateCoordinateChange(currentPosition, direction, offsetKM) {
     return newCoordinatePosition;
 }
 
-
-/*
-function generateGrid(centerPosition, numBlocks) {
-
-}
-
-/*
-const user_pos = {
-    lat: 33.88384,
-    lng: 118.39161
-};
-
-const new_pos = calculateCoordinateChange(user_pos, directions.West, 1.02);
-console.log(new_pos.lat);
-console.log(new_pos.lng);
-
-*/

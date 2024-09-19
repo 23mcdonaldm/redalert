@@ -1,13 +1,16 @@
 const pool = require('../dbms/database');
 
+//rendering map page
 module.exports.map_get = (req, res) => {
     res.render('map');
 }
 
+//rendering administrator map page
 module.exports.admin_map_get = (req, res) => {
     res.render('administratorMap');
 }
 
+//maps
 module.exports.mapUserCoordinates = async (req, res) => {
     const { posInput, curr_user, status } = req.body;
     
@@ -25,13 +28,10 @@ module.exports.mapUserCoordinates = async (req, res) => {
 }
 
 module.exports.getUserList = async (req, res) => {
-    console.log("SEarching>..");
+    
     try {
         const insertQuery = `SELECT * FROM geolocation`;
-        console.log('...');
         const result = await pool.query(insertQuery);
-        console.log("results...");
-        console.log(result.rows);
         res.json(result.rows);
     } catch(err) {
         console.error("Error fetching user list: " + err);

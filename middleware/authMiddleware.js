@@ -5,14 +5,12 @@ require('dotenv').config();
 const requireAuth = (req, res, next) => {
     const token = req.cookies.jwt;
     //if exists
-    console.log("checking authentication");
     if(token) {
         jwt.verify(token, process.env.JWT_SECRET, (err, decodedToken) => {
             if(err) {
                 console.log(err.message);
                 res.redirect('/login');
             } else {
-                console.log(decodedToken);
                 next();
             }
         })
@@ -34,7 +32,6 @@ const requireAdminAuth = (req, res, next) => {
                 console.error("Do not have administrator privilege: " + err);
                 res.redirect('/');
             } else {
-                //console.log(decodedToken);
                 next();
             }
         })
@@ -55,7 +52,6 @@ const checkUser = (req, res, next) => {
                 res.locals.user = null;
                 next();
             } else {
-                //console.log(decodedToken);
                 let insertQuery = `SELECT * FROM person WHERE person_uid = '${decodedToken.user_uid}'`;
                 let user = await pool.query(insertQuery);
                 res.locals.user = user.rows[0];

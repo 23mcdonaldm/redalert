@@ -5,6 +5,11 @@ const jwt = require('jsonwebtoken');
 
 
 const maxAge = 3 * 24 * 60 * 60 //3 days (jwt is in seconds, cookie is in milliseconds)
+/* creating a jwt token for user with 3 day expiration date, 
+**
+** user parameter represents an object with user_uid and user_type that will be input 
+** calls setUserSchool, which sets app.current_school_id to user's school in psql
+*/
 const createToken = (user) => {
     const user_uid = user.user_uid;
     const user_type = user.user_type;
@@ -15,6 +20,10 @@ const createToken = (user) => {
     });
 }
 
+/* sets app.current_school_id to user's school in psql
+** called from createToken(), lasts an entire session. question? does it still last when user leaves app but jwt not expired
+** takes same user parameter as createToken()
+*/
 async function setUserSchool(user) {
     try {
         let schoolQuery = `SELECT school_uid FROM person WHERE person_uid = '${user.user_uid}'`;
@@ -94,7 +103,7 @@ module.exports.register_post = async (req, res) => {
     
         const salt = await bcrypt.genSalt(saltRounds);
         const pwhash = await bcrypt.hash(password, salt);
-        //const hashpw = await bcrypt.hash(req.body.password, saltRounds);
+        
         let user = { 
             fullName: req.body.fullName, 
             user_type: req.body.user_type, 
@@ -188,7 +197,7 @@ function addUserSpecificAttributes(user, req) {
     
 }
 
-
+//logs user out
 module.exports.logout_get = (req, res) => {
     res.cookie('jwt', '', { maxAge: 1 });
     res.redirect('/');
@@ -243,46 +252,4 @@ module.exports.getUserData = async (req, res) => {
         res.status(500).json({ error: 'Database query failed' });
     }
 }
-
-
-
-
-    /*
-    if(user.user_type == 'student') {
-        let insertQuery = `INSERT INTO student(person_uid, name, username, pwhash, phone_number, email, student_id, school_uid) VALUES 
-                                        (uuid_generate_v4(), ${user.firstName}, ${user.username}, , 911, ${user.email}, ${user.id}, 
-                                        (SELECT school_uid FROM school WHERE name = ${user.school}))`;
-        client.query(insertQuery, (err, result) => {
-            if(!err) {
-                res.send("Student has registered!");
-            } else {
-                console.log(err);
-            }
-        })
-    }
-
-    else if(user.user_type == 'guardian') {
-        let insertQuery = `INSERT INTO student(person_uid, name, username, pwhash, phone_number, email, child_uid, school_uid) VALUES 
-                                        (uuid_generate_v4(), ${user.firstName}, ${user.username}, , 911, ${user.email}, , 
-                                        (SELECT school_uid FROM school WHERE name = ${user.school}))`;
-        client.query(insertQuery, (err, result) => {
-            if(!err) {
-                res.send("Guardian has registered!");
-            } else {
-                console.log(err);
-            }
-        })
-    } else if(user.user_type == 'administrator') {
-        let insertQuery = `INSERT INTO student(person_uid, name, username, pwhash, phone_number, email, child_uid, school_uid) VALUES 
-                                        (uuid_generate_v4(), ${user.firstName}, ${user.username}, , 911, ${user.email}, , 
-                                        (SELECT school_uid FROM school WHERE name = ${user.school}))`
-        client.query(insertQuery, (err, result) => {
-            if(!err) {
-                res.send("Administrator has registered!");
-            } else {
-                console.log(err);
-            }
-        })
-    }
-    */
 

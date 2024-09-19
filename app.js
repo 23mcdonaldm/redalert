@@ -20,13 +20,10 @@ app.use(express.urlencoded({ extended: true }));
 app.get('*', checkUser);
 
 app.get('/', (req, res) => {
-    //console.log(res.locals.user);
-    //res.sendFile('./templates/newindex.html', {root: __dirname});
     res.render('layout');
 })
 
 
-//app.get('/map', requireAuth, (req, res) => res.render('map'));
 
 //logins and registrations
 app.use(authRoutes);
