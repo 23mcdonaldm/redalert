@@ -4,6 +4,10 @@ module.exports.map_get = (req, res) => {
     res.render('map');
 }
 
+module.exports.admin_map_get = (req, res) => {
+    res.render('administratorMap');
+}
+
 module.exports.mapUserCoordinates = async (req, res) => {
     console.log('beginning inputting coordinates...');
     const { posInput, curr_user, status } = req.body;
@@ -25,3 +29,5 @@ module.exports.mapUserCoordinates = async (req, res) => {
         res.status(500).json({ error: 'Failed to save location' });
     }
 }
+
+

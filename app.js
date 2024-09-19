@@ -26,7 +26,7 @@ app.get('/', (req, res) => {
 })
 
 
-app.get('/map', requireAuth, (req, res) => res.render('map'));
+//app.get('/map', requireAuth, (req, res) => res.render('map'));
 
 //logins and registrations
 app.use(authRoutes);

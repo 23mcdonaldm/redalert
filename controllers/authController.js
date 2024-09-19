@@ -9,9 +9,22 @@ const createToken = (user) => {
     const user_uid = user.user_uid;
     const user_type = user.user_type;
     const jwtSecret = process.env.JWT_SECRET;
+    setUserSchool(user);
     return jwt.sign({ user_uid, user_type }, jwtSecret, {
         expiresIn: maxAge
     });
+}
+
+async function setUserSchool(user) {
+    try {
+        let schoolQuery = `SELECT school_uid FROM person WHERE person_uid = '${user.user_uid}'`;
+        let result = await pool.query(schoolQuery);
+        let schoolResult = result.rows[0].school_uid;
+        let insertQuery = `SET app.current_school_id = '${schoolResult}'`;
+        await pool.query(insertQuery);
+    } catch (err) {
+        console.error("Couldn't find user from school " + err);
+    }
 }
 
 
