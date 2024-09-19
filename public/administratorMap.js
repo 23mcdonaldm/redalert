@@ -6,6 +6,7 @@ let PinElement;
 let dataOutput = document.getElementById("data");
 let currLocationMarker;
 
+
 //getting userData for backend
 async function fetchUserTok() {
     try {
@@ -93,93 +94,40 @@ async function initMap() {
 
 }
 
+
+
+
+console.log("Window loaded. Starting mapping...");
 initMap();
+mapUsers();  
 
 
-function findMyCoordinates() {
-    
-    if(navigator.geolocation) {
-        console.log("location found");
-        navigator.geolocation.getCurrentPosition(
-            async (position) => {
-                const pos = {
-                    lat: position.coords.latitude,
-                    lng: position.coords.longitude
-                };
-                console.log(pos);
-                const status = 'Safe';
-                try {
-                    const curr_latitude = pos.lat;
-                    const curr_longitude = pos.lng;
-                    const posInput = 'Point(' + curr_latitude + ' ' + curr_longitude + ')';
-                    console.log('starting with ' + posInput);
-                    const response = await fetch('/mapUserCoordinates', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            posInput,
-                            curr_user,
-                            status
-                        }),
-                    });
-                } catch (err) {
-                    console.error('Error sending location data:', err);
-                }
-                
-                dataOutput.innerText = `User Location Data\n{\nLatitude: ${pos.lat}\nLongitude: ${pos.lng}\n}`;
-                //infoWindow.setPosition(pos);
-                //infoWindow.open(map);
-                map.setCenter(pos);
-                map.setZoom(15);
-                
-                const userLocationPin = new PinElement({
-                    scale: 1.5
-                });
-
-                currLocationMarker = new AdvancedMarkerElement({
-                    map: map,
-                    position: pos,
-                    title: "Current Location",
-                    content: userLocationPin.element,
-                    gmpClickable: true
-                  });
-
-                  const currLocationMarkerIW = new google.maps.InfoWindow({
-                    content: "Current Location!"
-                  });
-
-                  currLocationMarker.addListener("click", ()=> {
-                    currLocationMarkerIW.open(map, currLocationMarker);
-                  });
-                
-            },
-            (err) => {
-                alert(err.message);
-            })
-        
-    } else {
-        alert("Geolocation is not supported by your browser");
-    }
-}
-
-function mapUsers() {
-    const userList = userList();
-}
-
-async function userList() {
+async function mapUsers() {
+    console.log("mapping users...");
     try {
-        const insertQuery = `SELECT * FROM geolocation`;
-        const result = await pool.query(insertQuery);
-        result.rows.forEach(row => {
-            console.log(row);
+        const response = await fetch('/getUserList');
+        console.log("responses found: ");
+        console.log(response);
+        const geolocations = await response.json();
+        console.log("geolocations found:")
+        console.log(geolocations);
+        console.log("Rows logging... "); 
+        const userList = document.getElementById("user-list");   
+        geolocations.forEach(geo => {
+            const li = document.createElement('li');
+            li.className = "list-group-item";
+            li.textContent = geo.student_uid;
+            li.dataset.userId = geo.location_uid;
+            userList.appendChild(li);
         })
     } catch(err) {
-        console.error("Error fetching user list: " + err);
+        console.error("Couldn't map users: " + err);
     }
-
+    
+    
 }
+
+
 
 /*
 currLocationMarker.addEventListener("click", ({ domEvent, latLng }) => {
