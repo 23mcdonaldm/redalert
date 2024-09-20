@@ -104,7 +104,7 @@ mapUsers();
 
 
 
-
+let counter = 0;
 
 async function mapUsers() {
     console.log("mapping users...");
@@ -113,11 +113,15 @@ async function mapUsers() {
         const geolocations = await response.json();
         const userList = document.getElementById("user-list");   
         geolocations.forEach(async geo => {
+            
+            console.log("creating element...");
+            console.log(counter = counter + 1);
             const li = document.createElement('li');
             li.className = "list-group-item";
             const curr_student = await fetchUserData(geo.student_uid);
-            li.textContent = `${curr_student.username} - Status: ${geo.status}`;
-            li.textContent = geo.name;
+            console.log(curr_student);
+            li.textContent = `${curr_student.username} - Status: ${geo.status}\n${curr_student.name}`;
+            //li.textContent = geo.name;
 
             if (geo.status === 'Safe') {
                 li.style.color = 'green';
@@ -128,9 +132,9 @@ async function mapUsers() {
             }
             li.dataset.userId = geo.location_uid;
 
-            li.addEventListener('click', () => {
-                showMarkerOnMap(geo.location_uid); //TODO
-            })
+            //li.addEventListener('click', () => {
+                //showMarkerOnMap(geo.location_uid); //TODO
+            //})
             mapGeomLoc(curr_student, geo);
             userList.appendChild(li);
         })
@@ -160,6 +164,7 @@ async function mapGeomLoc(student, geo) {
 
     if(geo.status === 'Safe') {
         const safePinBackground = new PinElement({
+            scale: 1.5,
             background: "#1fa012",
             glyphColor: "white",
             borderColor: "white"
@@ -174,6 +179,7 @@ async function mapGeomLoc(student, geo) {
           });
     } else {
         const dangerPinBackground = new PinElement({
+            scale: 1.5,
             background: "red"
         });
     
@@ -189,6 +195,7 @@ async function mapGeomLoc(student, geo) {
 
       const currLocationMarkerIW = new google.maps.InfoWindow({
         content: `Student Info: Name: ${student.name}, Phone: ${student.phone_number}, Email: ${student.email}`
+        
       });
 
       currLocationMarker.addListener("click", ()=> {
