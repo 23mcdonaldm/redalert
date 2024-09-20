@@ -38,3 +38,31 @@ module.exports.getUserList = async (req, res) => {
         throw new Error('Couldnt get user list');
     }
 }
+
+module.exports.getSchoolCoordinates = async (req, res) => {
+    const { school_id } = req.body;
+    try {
+        const coordinateQuery = `SELECT ST_X(coordinates::geometry), ST_Y(coordinates::geometry) FROM school WHERE school_uid = '${school_id}'`;
+        const coordinates = await pool.query(coordinateQuery);
+        res.status(200).json(coordinates);
+    } catch (err) {
+        throw new Error("couldn't get school coordinates");
+    }
+    
+}
+
+module.exports.getLocationCoordinates = async (req, res) => {
+    const { geom } = req.body;
+    try {
+        console.log("getting location");
+        console.log(geom);
+        const coordinateQuery = `SELECT ST_X(geom::geometry), ST_Y(geom::geometry) FROM geolocation WHERE location_uid = '${geom}'`;
+        const coordinates = await pool.query(coordinateQuery);
+        console.log("returning:");
+        console.log(coordinates);
+        res.status(200).json(coordinates);
+    } catch (err) {
+        throw new Error("couldn't get location coordinates");
+    }
+    
+}

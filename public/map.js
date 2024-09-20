@@ -111,7 +111,7 @@ function findMyCoordinates() {
                 try {
                     const curr_latitude = pos.lat;
                     const curr_longitude = pos.lng;
-                    const posInput = 'Point(' + curr_latitude + ' ' + curr_longitude + ')';
+                    const posInput = 'Point(' + curr_longitude + ' ' + curr_latitude + ')';
                     console.log('starting with ' + posInput);
                     const response = await fetch('/mapUserCoordinates', {
                         method: 'POST',

@@ -123,6 +123,7 @@ nav .navbar-brand .black
     margin-right: 10%;
     height: 70%;
     width: 70%;
+    location: relative;
   }
   
   /* 
