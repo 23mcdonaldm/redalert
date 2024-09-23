@@ -4,7 +4,7 @@ let AdvancedMarkerElement;
 let PinElement;
 
 let dataOutput = document.getElementById("data");
-let currLocationMarker;
+//let currLocationMarker;
 //const apiKey = process.env.GOOGLE_API_KEY;
 
 //getting userData for backend
@@ -115,12 +115,13 @@ async function mapUsers() {
         geolocations.forEach(async geo => {
             
             console.log("creating element...");
-            console.log(counter = counter + 1);
+            const date = new Date(geo.timestamp);
+            const formattedDate = date.toISOString().split('T')[0];
             const li = document.createElement('li');
             li.className = "list-group-item";
             const curr_student = await fetchUserData(geo.student_uid);
             console.log(curr_student);
-            li.textContent = `${curr_student.username} - Status: ${geo.status}\n${curr_student.name}`;
+            li.textContent = `${curr_student.username} - Status: ${geo.status}\n${curr_student.name}\n${formattedDate}`;
             //li.textContent = geo.name;
 
             if (geo.status === 'Safe') {
@@ -132,9 +133,19 @@ async function mapUsers() {
             }
             li.dataset.userId = geo.location_uid;
 
-            //li.addEventListener('click', () => {
-                //showMarkerOnMap(geo.location_uid); //TODO
-            //})
+            li.style.cursor = 'pointer';
+
+            li.addEventListener('click', () => {
+                const this_marker = (markers[geo.student_uid].marker);
+                map.panTo(this_marker.position);
+                map.setZoom(17);
+
+                if (currentInfoWindow) {
+                    currentInfoWindow.close();
+                }
+                (markers[geo.student_uid].infoWindow).open(map, this_marker);
+                currentInfoWindow = (markers[geo.student_uid].infoWindow);
+            })
             mapGeomLoc(curr_student, geo);
             userList.appendChild(li);
         })
@@ -162,41 +173,36 @@ async function mapGeomLoc(student, geo) {
     const geoLongitude = foundGeo.rows[0].st_x;
     const position = { lat: geoLatitude, lng: geoLongitude };
 
-    if(geo.status === 'Safe') {
-        const safePinBackground = new PinElement({
-            scale: 1.5,
-            background: "#1fa012",
-            glyphColor: "white",
-            borderColor: "white"
-        });
-    
-        currLocationMarker = new AdvancedMarkerElement({
-            map: map,
-            position: position,
-            title: "Current Location",
-            content: safePinBackground.element,
-            gmpClickable: true
-          });
-    } else {
-        const dangerPinBackground = new PinElement({
-            scale: 1.5,
-            background: "red"
-        });
-    
-    
-        currLocationMarker = new AdvancedMarkerElement({
-            map: map,
-            position: position,
-            title: "Current Location",
-            content: dangerPinBackground.element,
-            gmpClickable: true
-          });
-    }
 
-      const currLocationMarkerIW = new google.maps.InfoWindow({
-        content: `Student Info: Name: ${student.name}, Phone: ${student.phone_number}, Email: ${student.email}`
-        
+    const pinBackground = {
+        background: geo.status === 'Safe' ? "#1fa012" : "red",
+        scale: 1.5,
+        glyphColor: geo.status === 'Safe' ? "white" : undefined, // Only set glyphColor if status is 'Safe'
+        borderColor: geo.status === 'Safe' ? "white" : undefined // Only set borderColor if status is 'Safe'
+    };
+    
+    const pin = new PinElement(pinBackground);
+
+    
+    
+    const currLocationMarker = new AdvancedMarkerElement({
+        map: map,
+        position: position,
+        title: "Current Location",
+        content: pin.element,
+        gmpClickable: true
       });
+
+
+    const currLocationMarkerIW = new google.maps.InfoWindow({
+        content: `Student Info: Name: ${student.name}, Phone: ${student.phone_number}, Email: ${student.email}`
+    });
+
+    markers[geo.student_uid] = {
+        marker: currLocationMarker,
+        infoWindow: currLocationMarkerIW
+    };
+    
 
       currLocationMarker.addListener("click", ()=> {
         if (currentInfoWindow) {
@@ -205,6 +211,16 @@ async function mapGeomLoc(student, geo) {
         currLocationMarkerIW.open(map, currLocationMarker);
         currentInfoWindow = currLocationMarkerIW;
       });
+
+      pin.element.style.cursor = 'pointer';
+
+      pin.element.addEventListener('mouseenter', () => {
+        pin.element.style.transform = 'scale(1.1)'; // Scale up on hover
+    });
+    
+    pin.element.addEventListener('mouseleave', () => {
+        pin.element.style.transform = 'scale(1)'; // Scale back down
+    });
 }
 
 let currentInfoWindow = null;
