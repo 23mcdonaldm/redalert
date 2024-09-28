@@ -72,8 +72,6 @@ async function initMap() {
     position: position,
     title: "Uluru",
   });
-
-  
   
   if(curr_user.user_type == 'student') {
 
@@ -85,18 +83,8 @@ async function initMap() {
   map.controls[google.maps.ControlPosition.TOP_CENTER].push(locationButton);
 
     locationButton.addEventListener("click", () => {
-        console.log("finding status");
-        const statusForm = document.getElementById('status-form');
-        let status = statusForm.querySelector('input[name="status"]:checked');
-        if(!status) {
-            status = 'Safe';
-        } else {
-            status = status.value;
-        }
-        console.log("status: " + status);
         console.log("finding location");
-        
-        findMyCoordinates(status);
+        findMyCoordinates();
     
     });
 
@@ -108,7 +96,7 @@ async function initMap() {
 initMap();
 
 
-function findMyCoordinates(status) {
+function findMyCoordinates() {
     
     if(navigator.geolocation) {
         console.log("location found");
@@ -119,12 +107,12 @@ function findMyCoordinates(status) {
                     lng: position.coords.longitude
                 };
                 console.log(pos);
+                const status = 'Safe';
                 try {
                     const curr_latitude = pos.lat;
                     const curr_longitude = pos.lng;
                     const posInput = 'Point(' + curr_longitude + ' ' + curr_latitude + ')';
                     console.log('starting with ' + posInput);
-                    console.log("status: " + status);
                     const response = await fetch('/mapUserCoordinates', {
                         method: 'POST',
                         headers: {
