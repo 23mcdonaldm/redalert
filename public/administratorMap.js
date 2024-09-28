@@ -27,11 +27,19 @@ async function fetchUserTok() {
 
 async function fetchUserData(user_uid) {
     try {
-        const response = await fetch(`/fetchUserData/${user_uid}`);
+        console.log("Fetching user data, user_uid: " + user_uid);
+        const response = await fetch(`/fetchUserData`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ user_uid })
+        });
         if(!response.ok) {
             throw new Error('Error getting user details');
         }
         const user = await response.json();
+        console.log("User in fetchUserData fun: " + user);
         return user;
     } catch (err) {
         console.error('Failed to fetch user details', err);
@@ -40,6 +48,7 @@ async function fetchUserData(user_uid) {
 }
 //gets user token and then gets the full user object from here
 const curr_user_tok = await fetchUserTok();
+console.log("curr_user::" + JSON.stringify(curr_user_tok.user_uid));
 const curr_user = await fetchUserData(curr_user_tok.user_uid);
 
 
@@ -111,6 +120,7 @@ async function mapUsers() {
     try {
         const response = await fetch('/getUserList');
         const geolocations = await response.json();
+        console.log("geolocations: " + geolocations);
         const userList = document.getElementById("user-list");   
         geolocations.forEach(async geo => {
             
@@ -119,8 +129,9 @@ async function mapUsers() {
             const formattedDate = date.toISOString().split('T')[0];
             const li = document.createElement('li');
             li.className = "list-group-item";
+            console.log("Geo.student_uid: " + geo.student_uid);
             const curr_student = await fetchUserData(geo.student_uid);
-            console.log(curr_student);
+            console.log("Curr student from id: " + curr_student);
             li.textContent = `${curr_student.username} - Status: ${geo.status}\n${curr_student.name}\n${formattedDate}`;
             //li.textContent = geo.name;
 

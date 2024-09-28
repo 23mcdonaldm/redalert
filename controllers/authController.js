@@ -2,15 +2,15 @@ const pool = require('../dbms/database');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-
+console.log("helloooo");
 
 const maxAge = 3 * 24 * 60 * 60 //3 days (jwt is in seconds, cookie is in milliseconds)
 /* creating a jwt token for user with 3 day expiration date, 
 **
 ** user parameter represents an object with user_uid and user_type that will be input 
-** calls setUserSchool, which sets app.current_school_id to user's school in psql
+** calls setUserSchool, which sets myapp.current_school_uid to user's school in psql
 */
-const createToken = (user) => {
+function createToken(user) {
     const user_uid = user.user_uid;
     const user_type = user.user_type;
     const jwtSecret = process.env.JWT_SECRET;
@@ -20,21 +20,27 @@ const createToken = (user) => {
     });
 }
 
-/* sets app.current_school_id to user's school in psql
+/* sets myapp.current_school_uid to user's school in psql
 ** called from createToken(), lasts an entire session. question? does it still last when user leaves app but jwt not expired
 ** takes same user parameter as createToken()
 */
+
 async function setUserSchool(user) {
     try {
         let schoolQuery = `SELECT school_uid FROM person WHERE person_uid = '${user.user_uid}'`;
         let result = await pool.query(schoolQuery);
+        console.log("result school_uid:" + result.rows[0].school_uid);
         let schoolResult = result.rows[0].school_uid;
-        let insertQuery = `SET app.current_school_id = '${schoolResult}'`;
+        let insertQuery = `SET myapp.current_school_uid = '${schoolResult}'`;
         await pool.query(insertQuery);
+        let setRLSQuery = `SET ROLE school_role`;
+        await pool.query(setRLSQuery);
     } catch (err) {
         console.error("Couldn't find user from school " + err);
     }
 }
+
+//module.exports = { setUserSchool, };
 
 
 //rendering register page
@@ -222,8 +228,10 @@ module.exports.check_username = async (req, res) => {
 
 //backend
 module.exports.getUserTok = (req, res) => {
+    console.log("hello?");
     const token = req.cookies.jwt;
-
+    console.log("All cookies: ", req.cookies);
+    console.log("token: " + token);
     if(token) {
         jwt.verify(token, process.env.JWT_SECRET, (err, decodedToken) => {
             if(err) {
@@ -239,8 +247,8 @@ module.exports.getUserTok = (req, res) => {
 
 
 module.exports.getUserData = async (req, res) => {
-    const { user_uid } = req.params;
-    
+    const { user_uid } = req.body;
+    console.log("User_uid in backend getuserData: " + user_uid);
     try {
         const result = await pool.query(`SELECT * FROM person WHERE person_uid = '${user_uid}'`);
         if( result.rows.length > 0) {

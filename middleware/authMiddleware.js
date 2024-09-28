@@ -55,6 +55,12 @@ const checkUser = (req, res, next) => {
                 let insertQuery = `SELECT * FROM person WHERE person_uid = '${decodedToken.user_uid}'`;
                 let user = await pool.query(insertQuery);
                 res.locals.user = user.rows[0];
+
+                const setRoleQuery = `SET ROLE school_role`;
+                const setSchoolQuery = `SET myapp.current_school_uid = '${user.rows[0].school_uid}'`;
+
+                await pool.query(setRoleQuery);
+                await pool.query(setSchoolQuery);
                 next();
             }
         })
