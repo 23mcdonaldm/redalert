@@ -1,3 +1,5 @@
+
+
 const pool = require('../dbms/database');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
@@ -55,6 +57,53 @@ const checkUser = (req, res, next) => {
                 let insertQuery = `SELECT * FROM person WHERE person_uid = '${decodedToken.user_uid}'`;
                 let user = await pool.query(insertQuery);
                 res.locals.user = user.rows[0];
+                
+                if (res.locals.user) {
+                    const userId = res.locals.user.person_uid;
+    
+                    await pool.query('BEGIN');
+    
+                    // Check the current role
+                    const currentUserResult = await pool.query(`SELECT current_user;`);
+                    const currentUser = currentUserResult.rows[0].current_user;
+    
+                    if (currentUser !== 'school_role') {
+                        await pool.query(`SET ROLE school_role`);
+                    }
+    
+                    await pool.query(`SET myapp.current_school_uid = '${user.rows[0].school_uid}'`);
+    
+                    await pool.query('COMMIT');
+                }
+                
+
+                next();
+            }
+        })
+    } else {
+        res.locals.user = null;
+        next();
+    }
+}
+
+
+
+
+/*
+
+//front end, passed from middleware to the views rendered
+const checkUser = (req, res, next) => {
+    const token = req.cookies.jwt
+    if(token) {
+        jwt.verify(token, process.env.JWT_SECRET, async (err, decodedToken) => {
+            if(err) {
+                console.log(err.message);
+                res.locals.user = null;
+                next();
+            } else {
+                let insertQuery = `SELECT * FROM person WHERE person_uid = '${decodedToken.user_uid}'`;
+                let user = await pool.query(insertQuery);
+                res.locals.user = user.rows[0];
 
                 const setRoleQuery = `SET ROLE school_role`;
                 const setSchoolQuery = `SET myapp.current_school_uid = '${user.rows[0].school_uid}'`;
@@ -69,5 +118,7 @@ const checkUser = (req, res, next) => {
         next();
     }
 }
+*/
+
 
 module.exports = { requireAuth , checkUser , requireAdminAuth };

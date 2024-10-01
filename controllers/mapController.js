@@ -41,11 +41,9 @@ module.exports.getUserList = async (req, res) => {
 
 module.exports.getSchoolCoordinates = async (req, res) => {
     const { school_id } = req.body;
-    console.log("SCHOOL ID: " + school_id);
     try {
         const coordinateQuery = `SELECT ST_X(coordinates::geometry), ST_Y(coordinates::geometry) FROM school WHERE school_uid = '${school_id}'`;
         const coordinates = await pool.query(coordinateQuery);
-        console.log("coordinates: " + coordinates);
         res.status(200).json(coordinates);
     } catch (err) {
         throw new Error("couldn't get school coordinates");

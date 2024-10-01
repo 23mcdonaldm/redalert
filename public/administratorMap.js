@@ -1,7 +1,8 @@
 let map, infoWindow;
+let AdvancedMarkerElement, PinElement;
 let Map;
-let AdvancedMarkerElement;
-let PinElement;
+//let AdvancedMarkerElement;
+
 
 let dataOutput = document.getElementById("data");
 let currLocationMarker;
@@ -27,19 +28,11 @@ async function fetchUserTok() {
 
 async function fetchUserData(user_uid) {
     try {
-        console.log("Fetching user data, user_uid: " + user_uid);
-        const response = await fetch(`/fetchUserData`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ user_uid })
-        });
+        const response = await fetch(`/fetchUserData/${user_uid}`);
         if(!response.ok) {
             throw new Error('Error getting user details');
         }
         const user = await response.json();
-        console.log("User in fetchUserData fun: " + user);
         return user;
     } catch (err) {
         console.error('Failed to fetch user details', err);
@@ -48,7 +41,6 @@ async function fetchUserData(user_uid) {
 }
 //gets user token and then gets the full user object from here
 const curr_user_tok = await fetchUserTok();
-console.log("curr_user::" + JSON.stringify(curr_user_tok.user_uid));
 const curr_user = await fetchUserData(curr_user_tok.user_uid);
 
 
@@ -60,9 +52,15 @@ async function initMap() {
   // Request needed libraries.
   //@ts-ignore
   try {
-    ({ Map } = await google.maps.importLibrary("maps"));
-    ({ AdvancedMarkerElement } = await google.maps.importLibrary("marker"));
-    ({ PinElement } = await google.maps.importLibrary("marker"));
+    const mapLibrary = await google.maps.importLibrary("maps");
+    const markerLibrary = await google.maps.importLibrary("marker");
+    Map = mapLibrary.Map;
+    AdvancedMarkerElement = markerLibrary.AdvancedMarkerElement;
+    PinElement = markerLibrary.PinElement;
+
+    if (!Map || !AdvancedMarkerElement || !PinElement) { 
+        throw new Error("couldnt import google maps classes")
+    }
   } catch (err) {
     throw new Error("couldn't import google maps libraries");
   }
@@ -87,7 +85,12 @@ async function initMap() {
 
 
   // The map, centered at Uluru
-  map = new Map(document.getElementById("map"), {
+  const mapElement = document.getElementById("map");
+  if(!mapElement) {
+    console.error("Map element not found");
+    return;
+  }
+  map = new Map(mapElement, {
     zoom: 15,
     center: position,
     mapId: "DEMO_MAP_ID",
@@ -98,7 +101,7 @@ async function initMap() {
   const marker = new AdvancedMarkerElement({
     map: map,
     position: position,
-    title: "Uluru",
+    title: "School Location",
   });
 
 
@@ -120,18 +123,18 @@ async function mapUsers() {
     try {
         const response = await fetch('/getUserList');
         const geolocations = await response.json();
-        console.log("geolocations: " + geolocations);
-        const userList = document.getElementById("user-list");   
-        geolocations.forEach(async geo => {
+        const userList = document.getElementById("user-list");  
+        console.log("GEOS: " + JSON.stringify(geolocations)); 
+        const promises = geolocations.forEach(async geo => {
             
             console.log("creating element...");
-            console.log(counter = counter + 1);
+            const date = new Date(geo.timestamp);
+            const formattedDate = date.toISOString().split('T')[0];
             const li = document.createElement('li');
             li.className = "list-group-item";
-            console.log("Geo.student_uid: " + geo.student_uid);
             const curr_student = await fetchUserData(geo.student_uid);
             console.log(curr_student);
-            li.textContent = `${curr_student.username} - Status: ${geo.status}\n${curr_student.name}`;
+            li.textContent = `${curr_student.username} - Status: ${geo.status}\n${curr_student.name}\n${formattedDate}`;
             //li.textContent = geo.name;
 
             if (geo.status === 'Safe') {
@@ -143,12 +146,24 @@ async function mapUsers() {
             }
             li.dataset.userId = geo.location_uid;
 
-            //li.addEventListener('click', () => {
-                //showMarkerOnMap(geo.location_uid); //TODO
-            //})
-            mapGeomLoc(curr_student, geo);
+            li.style.cursor = 'pointer';
+
+            li.addEventListener('click', () => {
+                const this_marker = (markers[geo.student_uid].marker);
+                map.panTo(this_marker.position);
+                map.setZoom(17);
+
+                if (currentInfoWindow) {
+                    currentInfoWindow.close();
+                }
+                (markers[geo.student_uid].infoWindow).open(map, this_marker);
+                currentInfoWindow = (markers[geo.student_uid].infoWindow);
+            })
+            await mapGeomLoc(curr_student, geo);
             userList.appendChild(li);
         })
+
+        await Promise.all(promises);
     } catch(err) {
         console.error("Couldn't map users: " + err);
     }
@@ -158,6 +173,8 @@ async function mapUsers() {
 const markers = {};
 
 async function mapGeomLoc(student, geo) {
+    const markerLibrary = await google.maps.importLibrary("marker");
+    PinElement = markerLibrary.PinElement;
     
     const geom = geo.location_uid;
     console.log("sending geom: " + geom);
@@ -173,41 +190,40 @@ async function mapGeomLoc(student, geo) {
     const geoLongitude = foundGeo.rows[0].st_x;
     const position = { lat: geoLatitude, lng: geoLongitude };
 
-    if(geo.status === 'Safe') {
-        const safePinBackground = new PinElement({
-            scale: 1.5,
-            background: "#1fa012",
-            glyphColor: "white",
-            borderColor: "white"
-        });
-    
-        currLocationMarker = new AdvancedMarkerElement({
-            map: map,
-            position: position,
-            title: "Current Location",
-            content: safePinBackground.element,
-            gmpClickable: true
-          });
-    } else {
-        const dangerPinBackground = new PinElement({
-            scale: 1.5,
-            background: "red"
-        });
-    
-    
-        currLocationMarker = new AdvancedMarkerElement({
-            map: map,
-            position: position,
-            title: "Current Location",
-            content: dangerPinBackground.element,
-            gmpClickable: true
-          });
-    }
 
-      const currLocationMarkerIW = new google.maps.InfoWindow({
-        content: `Student Info: Name: ${student.name}, Phone: ${student.phone_number}, Email: ${student.email}`
-        
+
+    
+    const pinBackground = {
+        background: geo.status === 'Safe' ? "#1fa012" : "red",
+        scale: 1.5,
+        glyphColor: geo.status === 'Safe' ? "white" : undefined, // Only set glyphColor if status is 'Safe'
+        borderColor: geo.status === 'Safe' ? "white" : undefined // Only set borderColor if status is 'Safe'
+    };
+    
+    const pin = new PinElement(pinBackground);
+
+    
+    
+    const currLocationMarker = new AdvancedMarkerElement({
+        map: map,
+        position: position,
+        title: "Current Location",
+        content: pin.element,
+        gmpClickable: true
       });
+
+    
+
+    
+    const currLocationMarkerIW = new google.maps.InfoWindow({
+        content: `Student Info: Name: ${student.name}, Phone: ${student.phone_number}, Email: ${student.email}`
+    });
+    
+    markers[geo.student_uid] = {
+        marker: currLocationMarker,
+        infoWindow: currLocationMarkerIW
+    };
+    
 
       currLocationMarker.addListener("click", ()=> {
         if (currentInfoWindow) {
@@ -216,6 +232,16 @@ async function mapGeomLoc(student, geo) {
         currLocationMarkerIW.open(map, currLocationMarker);
         currentInfoWindow = currLocationMarkerIW;
       });
+
+      pin.element.style.cursor = 'pointer';
+
+      pin.element.addEventListener('mouseenter', () => {
+        pin.element.style.transform = 'scale(1.1)'; // Scale up on hover
+    });
+    
+    pin.element.addEventListener('mouseleave', () => {
+        pin.element.style.transform = 'scale(1)'; // Scale back down
+    });
 }
 
 let currentInfoWindow = null;

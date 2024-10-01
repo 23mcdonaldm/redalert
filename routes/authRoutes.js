@@ -10,7 +10,6 @@ router.post('/login', authController.login_post);
 router.get('/check-username', authController.check_username);
 router.get('/logout', authController.logout_get);
 router.get('/getUserTok', authController.getUserTok);
-router.post(`/fetchUserData`, authController.getUserData);
-//router.get('/createToken', authController.createToken);
+router.get(`/fetchUserData/:user_uid`, authController.getUserData);
 
 module.exports = router;
