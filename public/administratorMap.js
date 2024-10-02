@@ -116,7 +116,6 @@ mapUsers();
 
 
 
-let counter = 0;
 
 async function mapUsers() {
     console.log("mapping users...");

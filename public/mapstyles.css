@@ -23,6 +23,10 @@ html, body {
     
   }
 
+  .filter {
+    margin-bottom: 20px;
+  }
+
   nav .navbar-brand
 {
     font-size: xx-large;

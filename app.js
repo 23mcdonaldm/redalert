@@ -1,6 +1,7 @@
 const express = require('express')
 const authRoutes = require('./routes/authRoutes');
 const mapRoutes = require('./routes/mapRoutes');
+const discRoutes = require('./routes/discRoutes');
 const cookieParser = require('cookie-parser');
 const { requireAuth, checkUser , requireAdminAuth } = require('./middleware/authMiddleware');
 const pool = require('./dbms/database');
@@ -23,12 +24,20 @@ app.get('/', (req, res) => {
     res.render('layout');
 })
 
+app.get('/discussion', (req, res) => {
+    res.render('discussion');
+})
 
+app.get('/discussion2', (req, res) => {
+    res.render('discussion2');
+})
 
 //logins and registrations
 app.use(authRoutes);
 
 app.use(mapRoutes);
+
+app.use(discRoutes);
 
 //doesn't match any above routes, 404s
 app.use((req, res) => {
