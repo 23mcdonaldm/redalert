@@ -2,6 +2,7 @@ const express = require('express')
 const authRoutes = require('./routes/authRoutes');
 const mapRoutes = require('./routes/mapRoutes');
 const discRoutes = require('./routes/discRoutes');
+const randomRoutes = require('./routes/randomRoutes');
 const cookieParser = require('cookie-parser');
 const { requireAuth, checkUser , requireAdminAuth } = require('./middleware/authMiddleware');
 const pool = require('./dbms/database');
@@ -24,13 +25,8 @@ app.get('/', (req, res) => {
     res.render('layout');
 })
 
-app.get('/discussion', (req, res) => {
-    res.render('discussion');
-})
 
-app.get('/discussion2', (req, res) => {
-    res.render('discussion2');
-})
+app.use(randomRoutes);
 
 //logins and registrations
 app.use(authRoutes);

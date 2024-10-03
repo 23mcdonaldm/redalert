@@ -24,7 +24,7 @@ function renderPosts(posts) {
     const postList = document.getElementById("post-list");
     //postList.innerHTML = '';
     
-
+    
     posts.discussions.forEach(post => {
         const postDiv = document.createElement('li');
         postDiv.className = 'post';
@@ -46,6 +46,11 @@ function renderPosts(posts) {
             </div>
         `;
 
+        const viewRepliesButton = postDiv.querySelector('.view-replies-button');
+        viewRepliesButton.addEventListener('click', () => {
+
+        })
+        
         //postDiv.appendChild(repliesContainer);
         postList.appendChild(postDiv);
 
