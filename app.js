@@ -2,7 +2,7 @@ const express = require('express')
 const authRoutes = require('./routes/authRoutes');
 const mapRoutes = require('./routes/mapRoutes');
 const discRoutes = require('./routes/discRoutes');
-const randomRoutes = require('./routes/randomRoutes');
+const reportsRoutes = require('./routes/reportsRoutes');
 const cookieParser = require('cookie-parser');
 const { requireAuth, checkUser , requireAdminAuth } = require('./middleware/authMiddleware');
 const pool = require('./dbms/database');
@@ -26,7 +26,7 @@ app.get('/', (req, res) => {
 })
 
 
-app.use(randomRoutes);
+app.use(reportsRoutes);
 
 //logins and registrations
 app.use(authRoutes);
