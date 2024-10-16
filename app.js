@@ -4,14 +4,18 @@ const mapRoutes = require('./routes/mapRoutes');
 const discRoutes = require('./routes/discRoutes');
 const reportsRoutes = require('./routes/reportsRoutes');
 const cookieParser = require('cookie-parser');
+const path = require('path');
 const { requireAuth, checkUser , requireAdminAuth } = require('./middleware/authMiddleware');
 const pool = require('./dbms/database');
 require('dotenv').config();
 
+
+
 const app = express();
 
 //midlewares
-app.use(express.static("public"));
+app.use(express.static(path.join(__dirname, 'public')));
+//app.use(express.static("public"));
 //takes in any json data with request, passes into javascript object, attaches to req object
 app.use(express.json());
 app.use(cookieParser());

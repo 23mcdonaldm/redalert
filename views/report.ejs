@@ -17,8 +17,19 @@
     
     <label class="form-label">Declare an Emergency</label>
 
+    <div class="mb-3"></div>
+        <label class="form-label" style="margin-right: 10px;">Reporting an </label>
+        <input class="form-check-input" type="radio" id="emergency_option" name="report_type" value="emergency" required>
+        <label class="form-check-label" for="emergency_option">Emergency </label>
+        <input class="form-check-input" type="radio" id="non_emergency_option" name="report_type" value="non_emergency" required>
+        <label class="form-check-label" for="non_emergency_option">Non-Emergency</label>
+        <div>
+            <small id="emergencyFeedback"></small>
+        </div>
+    </div>
+
     <div class="mb-3">
-        <label class="form-label">Current Status of Emergency</label>
+        <label class="form-label">Current Status of Report</label>
           
         <input class="form-check-input" type="radio" id="active_option" name="status" value="active" required>
         <label class="form-check-label" for="active_option">Active</label>
@@ -125,6 +136,7 @@
         const apiKey = "<%= process.env.GOOGLE_API_KEY %>";
         const user_school = "<%= user.school_uid %>";
         const user_uid = "<%= user.person_uid %>";
+        const user_type = "<%= user.user_type %>";
         let currMapLoc;
         console.log("user_school" + JSON.stringify(user_school));
     
@@ -218,13 +230,21 @@
 
             const formData = new FormData(event.target);
             const data = Object.fromEntries(formData.entries());
-            console.log("data: " + JSON.stringify(data));
-            console.log(data.status);
 
             
             const outputData = { school_uid: user_school, status: data.status, event_type: data.event_type, 
                                  description: data.description, geom: currMapLoc, location_type: data.location_type, 
-                                 emergency: true, posting_type: data.posting_type, privacy_type: data.privacy_type };
+                                 posting_type: data.posting_type, privacy_type: data.privacy_type };
+            if(user_type == "administrator") {
+                outputData.verified = true;
+            } else {
+                outputData.verified = false;
+            }
+            if(data.report_type == "emergency") {
+                outputData.emergency = true;
+            } else {
+                outputData.emergency = false;
+            }
             if(data.privacy_type !== "anonymous") {
                 outputData.person_uid = user_uid;
             } else {
@@ -233,7 +253,7 @@
             
 
             try {
-                const res = await fetch('/declare', {
+                const res = await fetch('/report', {
                     method: 'POST',
                     body: JSON.stringify(outputData),
                     headers: {'Content-Type': 'application/json' }
@@ -256,6 +276,24 @@
 
 
         });
+
+        const emergencyOption = document.getElementById('emergency_option');
+        const nonEmergencyOption = document.getElementById('non_emergency_option');
+        const emergencyFeedback = document.getElementById('emergencyFeedback');
+        
+        function updateFeedback() {
+        if (emergencyOption.checked) {
+            emergencyFeedback.textContent = 'These threats involve police & are taken seriously.';
+            emergencyFeedback.style.color = 'red';
+        } else if (nonEmergencyOption.checked) {
+            emergencyFeedback.textContent = 'You are reporting a non-immediate emergency below.';
+            emergencyFeedback.style.color = 'orange';
+        } else {
+            emergencyFeedback.textContent = ''; // Clear feedback if neither is selected
+        }
+        }
+        emergencyOption.addEventListener('change', updateFeedback);
+        nonEmergencyOption.addEventListener('change', updateFeedback);
 
 
 

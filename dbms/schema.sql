@@ -148,6 +148,8 @@ GRANT ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA PUBLIC TO admin_role;
 
 --privileges for school_role
 GRANT ALL PRIVILEGES ON person, student, guardian, administrator, geolocation, discussion_post TO school_role;
+GRANT ALL PRIVILEGES ON reports TO school_role;
+GRANT ALL PRIVILEGES ON public_discussion_posts TO school_role;
 
 --privileges for read_only_role
 GRANT SELECT ON ALL TABLES IN SCHEMA PUBLIC TO read_only_role;
@@ -159,6 +161,7 @@ ALTER TABLE guardian ENABLE ROW LEVEL SECURITY;
 ALTER TABLE administrator ENABLE ROW LEVEL SECURITY;
 ALTER TABLE geolocation ENABLE ROW LEVEL SECURITY;
 ALTER TABLE discussion_post ENABLE ROW LEVEL SECURITY;
+ALTER TABLE report ENABLE ROW LEVEL SECURITY;
 --force RLS for table owner
 ALTER TABLE person FORCE ROW LEVEL SECURITY;
 ALTER TABLE student FORCE ROW LEVEL SECURITY;
@@ -166,6 +169,7 @@ ALTER TABLE guardian FORCE ROW LEVEL SECURITY;
 ALTER TABLE administrator FORCE ROW LEVEL SECURITY;
 ALTER TABLE geolocation FORCE ROW LEVEL SECURITY;
 ALTER TABLE discussion_post FORCE ROW LEVEL SECURITY;
+ALTER TABLE report FORCE ROW LEVEL SECURITY;
 
 --bypasses row level security, can see all rows for all schools
 ALTER ROLE admin_role BYPASSRLS;
@@ -197,6 +201,9 @@ USING (EXISTS (SELECT 1 FROM person WHERE person_uid = geolocation.student_uid A
 --school_role users can only access rows in discussion_post that are in their school
 CREATE POLICY discussion_post_access_policy ON discussion_post FOR ALL TO school_role
 USING (EXISTS(SELECT 1 FROM person WHERE person_uid = discussion_post.person_uid AND school_uid = current_setting('myapp.current_school_uid')::UUID));
+
+CREATE POLICY report_access_policy ON report FOR ALL TO school_role
+USING (EXISTS(SELECT 1 FROM person WHERE person_uid = report.person_uid AND school_uid = current_setting('myapp.current_school_uid')::UUID));
 
 --creates app_user, which all normal users will use, based off login will be granted specific role
 CREATE USER app_user WITH PASSWORD 'app_password';
@@ -232,6 +239,7 @@ BEFORE INSERT OR UPDATE ON discussion_post
 FOR EACH ROW EXECUTE FUNCTION check_person_uid_exists();
 
 
+
 --SELECT school_uid INTO given_school_uid FROM school WHERE name = school_name;
 
 -- --guardian_role users can only access rows in student that match their child
@@ -246,3 +254,36 @@ FOR EACH ROW EXECUTE FUNCTION check_person_uid_exists();
 --  CREATE POLICY guardian_guardian_access_policy ON guardian FOR ALL AS RESTRICTIVE TO guardian_role
 --  USING (current_user = username);
 
+CREATE OR REPLACE VIEW public_discussion_posts AS
+SELECT 
+    post_uid AS disc_uid,              -- Unique identifier for discussions
+    parent_post_uid,                   -- Parent post identifier for threads
+    subject,                            -- Subject of the discussion
+    timestamp,                          -- Timestamp of the post
+    type,                               -- Type of the post (discussion or report)
+    description,                        -- Description/content of the post
+    likes,                              -- Number of likes for the post
+    dislikes,                           -- Number of dislikes for the post
+    verified,                           -- Verification status of the post
+    person_uid,                         -- User ID of the person who created the post
+    school_uid,                         -- School ID for filtering
+    'discussion_post' AS source         -- Source identifier for discussion posts
+FROM discussion_post
+
+UNION ALL
+
+SELECT 
+    event_uid AS disc_uid,             -- Unique identifier for reports
+    '00000000-0000-0000-0000-000000000000' AS parent_post_uid,  -- Default for reports
+    event_type::character varying AS subject,  -- Cast event_type to character varying for compatibility
+    timestamp,                          -- Timestamp of the report
+    'report' AS type,                   -- Type indicator for reports
+    description,                        -- Description/content of the report
+    0 AS likes,                         -- Default likes for reports
+    0 AS dislikes,                      -- Default dislikes for reports
+    verified,                           -- Verification status of the report
+    person_uid,                         -- User ID of the person who created the report
+    school_uid,                         -- School ID for filtering
+    'report' AS source                  -- Source identifier for reports
+FROM report
+WHERE posting = 'public';

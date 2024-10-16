@@ -1,14 +1,14 @@
 const { Router } = require('express');
 const reportsController = require('../controllers/reportsController');
-const { requireAdminAuth } = require('../middleware/authMiddleware');
+const { requireAdminAuth, requireAuth } = require('../middleware/authMiddleware');
 
 
 const router = Router();
 
-router.post('/declare', reportsController.declare);
+router.post('/report', reportsController.report);
 
-router.get('/declare', requireAdminAuth, (req, res) => {
-    res.render('declare', { user: res.locals.user });
+router.get('/report', requireAuth, (req, res) => {
+    res.render('report', { user: res.locals.user });
 })
 
 
