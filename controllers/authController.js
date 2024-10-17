@@ -36,7 +36,6 @@ async function setUserSchool(user) {
     }
 }
 
-
 //rendering register page
 module.exports.register_get = (req, res) => {
     res.render('register');
@@ -58,7 +57,7 @@ module.exports.login_post = async (req, res) => {
     try {
         const logged_in_user = await login(user);
         const user_token = createToken(logged_in_user);
-        res.cookie('jwt', user_token, { maxAge: maxAge * 1000}); //add in secure requirement eventually
+        res.cookie('jwt', user_token, { maxAge: maxAge * 1000}); //TODO : add in secure requirement eventually
         res.status(200).json({ message: "User has logged in!" });
     } catch (err) {
         console.error("Login Error: ", err);
@@ -67,6 +66,7 @@ module.exports.login_post = async (req, res) => {
     
 }
 
+//checks user username and password and logs in
 const login = async (user) => {
     try {
         
@@ -93,14 +93,14 @@ const login = async (user) => {
     
 }
 
-//user logging in
+//user registering
 module.exports.register_post = async (req, res) => {
 
     try {  
+        //hashes password inputted, adds into the user to be added to db
         const saltRounds = 10;
         const password = req.body.password;
 
-    
         const salt = await bcrypt.genSalt(saltRounds);
         const pwhash = await bcrypt.hash(password, salt);
         
@@ -112,8 +112,6 @@ module.exports.register_post = async (req, res) => {
             email: req.body.email, 
             username: req.body.username, 
             password: pwhash }
-        
-        
         
         
         //add additional parameters
@@ -128,7 +126,7 @@ module.exports.register_post = async (req, res) => {
     }   
 }
 
-
+//adds user to db for registration, accounts for different user types 
 async function registerUser(user, res) {
     try {
         let insertQuery;
@@ -138,7 +136,6 @@ async function registerUser(user, res) {
                 insertQuery = `INSERT INTO student(person_uid, name, username, pwhash, phone_number, email, student_id, user_type, school_uid) VALUES 
                                             (uuid_generate_v4(), '${user.fullName}', '${user.username}', '${user.password}', ${user.phone_number}, '${user.email}', ${user.student_id}, '${user.user_type}',
                                             (SELECT school_uid FROM school WHERE name = '${user.school_name}'))`;
-                //values = [user.fullName, user.username, user.password, user.phone_number, user.email, user.student_id, user.school_name];
                 break;
     
             case 'guardian':
@@ -162,13 +159,13 @@ async function registerUser(user, res) {
         }
         await pool.query(insertQuery);
 
-
     } catch (err) {
         console.error("Error adding user to database:", err);
         throw new Error("Couldn't add user to database.");
     }
 }
 
+//adds specific attributes based off user_type, before updating database
 function addUserSpecificAttributes(user, req) {
     try {
         switch(user.user_type) {
@@ -197,7 +194,7 @@ function addUserSpecificAttributes(user, req) {
     
 }
 
-//logs user out
+//logs user out, resets jwt
 module.exports.logout_get = async (req, res) => {
     res.cookie('jwt', '', { maxAge: 1 });
     await pool.query(`SET ROLE postgres`);
@@ -205,6 +202,7 @@ module.exports.logout_get = async (req, res) => {
     res.redirect('/');
 }  
 
+//checks username as user is inputting or when user tries to register to see if its available
 module.exports.check_username = async (req, res) => {
     const { username } = req.query;
 
@@ -251,6 +249,7 @@ module.exports.getUserData = async (req, res) => {
             res.status(404).json({ error: 'User not found' });
         }
     } catch (err) {
+        console.log("couldnt get user data" + err);
         res.status(500).json({ error: 'Database query failed' });
     }
 }

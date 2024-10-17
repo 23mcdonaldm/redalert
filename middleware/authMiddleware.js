@@ -86,39 +86,4 @@ const checkUser = (req, res, next) => {
     }
 }
 
-
-
-
-/*
-
-//front end, passed from middleware to the views rendered
-const checkUser = (req, res, next) => {
-    const token = req.cookies.jwt
-    if(token) {
-        jwt.verify(token, process.env.JWT_SECRET, async (err, decodedToken) => {
-            if(err) {
-                console.log(err.message);
-                res.locals.user = null;
-                next();
-            } else {
-                let insertQuery = `SELECT * FROM person WHERE person_uid = '${decodedToken.user_uid}'`;
-                let user = await pool.query(insertQuery);
-                res.locals.user = user.rows[0];
-
-                const setRoleQuery = `SET ROLE school_role`;
-                const setSchoolQuery = `SET myapp.current_school_uid = '${user.rows[0].school_uid}'`;
-
-                await pool.query(setRoleQuery);
-                await pool.query(setSchoolQuery);
-                next();
-            }
-        })
-    } else {
-        res.locals.user = null;
-        next();
-    }
-}
-*/
-
-
 module.exports = { requireAuth , checkUser , requireAdminAuth };

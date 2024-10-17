@@ -5,38 +5,9 @@ let PinElement;
 
 let dataOutput = document.getElementById("data");
 let currLocationMarker;
+import { fetchUserData, fetchUserTok } from '../utils/api.js'; 
 
-//getting userData for backend
-async function fetchUserTok() {
-    try {
-        const response = await fetch('/getUserTok');
 
-        if(!response.ok) {
-            throw new Error('Error getting user cookie data');
-        }
-        const data = await response.json();
-        console.log('User data: ', data);
-
-        return data;
-    } catch (err) {
-        console.error('Failed to fetch data');
-        return null;
-    }
-}
-
-async function fetchUserData(user_uid) {
-    try {
-        const response = await fetch(`/fetchUserData/${user_uid}`);
-        if(!response.ok) {
-            throw new Error('Error getting user details');
-        }
-        const user = await response.json();
-        return user;
-    } catch (err) {
-        console.error('Failed to fetch user details', err);
-        return null;
-    }
-}
 //gets user token and then gets the full user object from here
 const curr_user_tok = await fetchUserTok();
 const curr_user = await fetchUserData(curr_user_tok.user_uid);
@@ -118,13 +89,10 @@ function findMyCoordinates(status) {
                     lat: position.coords.latitude,
                     lng: position.coords.longitude
                 };
-                console.log(pos);
                 try {
                     const curr_latitude = pos.lat;
                     const curr_longitude = pos.lng;
                     const posInput = 'Point(' + curr_longitude + ' ' + curr_latitude + ')';
-                    console.log('starting with ' + posInput);
-                    console.log("status: " + status);
                     const response = await fetch('/mapUserCoordinates', {
                         method: 'POST',
                         headers: {
@@ -175,25 +143,6 @@ function findMyCoordinates(status) {
         alert("Geolocation is not supported by your browser");
     }
 }
-
-function mapUsers() {
-    const userList = userList();
-}
-
-async function userList() {
-    try {
-        const insertQuery = `SELECT * FROM geolocation`;
-        const result = await pool.query(insertQuery);
-        result.rows.forEach(row => {
-            console.log(row);
-        })
-    } catch(err) {
-        console.error("Error fetching user list: " + err);
-    }
-
-}
-
-
 
 const directions = Object.freeze({
     North: 0,

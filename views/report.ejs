@@ -132,18 +132,20 @@
     <!--<script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places&callback=initAutocomplete" async defer> </script>-->
     <script>
         
-        
+        //different values to store from getting user from checkUser when page loads
         const apiKey = "<%= process.env.GOOGLE_API_KEY %>";
         const user_school = "<%= user.school_uid %>";
         const user_uid = "<%= user.person_uid %>";
         const user_type = "<%= user.user_type %>";
+
         let currMapLoc;
         console.log("user_school" + JSON.stringify(user_school));
     
-    (g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})
+        (g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})
         ({key: apiKey, v: "weekly"});
 
-        
+        //different fields open up by clicking location type
+        //TODO : handle different location types
         document.querySelectorAll('input[name="location_type"]').forEach(radio => {
             radio.addEventListener('change', function() {
                 // Hide all specific fields
@@ -159,23 +161,12 @@
                 } 
             });
         });
-        /*
-        document.querySelector('addressInput').addEventListener('change', function() {
-            //const encodedAddress = encodeURIComponent(this.value);
-            //const apiKey = process.env.GOOGLE_API_KEY;
-            
-            
-        })*/
-        /*
-        async function initAutcomplete() {
-
-        }*/
-        
 
         async function initMap() {
         
         // Request needed libraries.
         const { Map } = await google.maps.importLibrary("maps");
+        //gets school coordinates
         const result = await fetch(`/getSchoolCoordinates`, {
             method: 'POST',
             headers: {
@@ -184,16 +175,13 @@
             body: JSON.stringify({ school_uid: user_school })
         });
         const schoolLatlng = await result.json();
-        console.log("school lat lng: " + schoolLatlng);
-        console.log(JSON.stringify(schoolLatlng.st_x));
-        console.log(schoolLatlng.st_y);
-        
+        //school map center
         const mapCenter = {
             lat: schoolLatlng.st_y,
             lng: schoolLatlng.st_x
         };
         currMapLoc = mapCenter;
-        
+        //maps to school
         const map = new google.maps.Map(document.getElementById("mapField"), {
             zoom: 15,
             center: mapCenter,
@@ -227,31 +215,32 @@
         //submitting the data
         document.getElementById('emergencyForm').addEventListener('submit', async (event) => {
             event.preventDefault(); // Prevent the default form submission
-
             const formData = new FormData(event.target);
             const data = Object.fromEntries(formData.entries());
 
-            
+            //initial output data from form
             const outputData = { school_uid: user_school, status: data.status, event_type: data.event_type, 
                                  description: data.description, geom: currMapLoc, location_type: data.location_type, 
                                  posting_type: data.posting_type, privacy_type: data.privacy_type };
+            //checks if administrator, if administrator automatically verified
             if(user_type == "administrator") {
                 outputData.verified = true;
             } else {
                 outputData.verified = false;
             }
+            //checks if emergency
             if(data.report_type == "emergency") {
                 outputData.emergency = true;
             } else {
                 outputData.emergency = false;
             }
+            //checks if anonymous report or not
             if(data.privacy_type !== "anonymous") {
                 outputData.person_uid = user_uid;
             } else {
                 outputData.person_uid = '00000000-0000-0000-0000-000000000000';
             }
-            
-
+            //attempts to post to db
             try {
                 const res = await fetch('/report', {
                     method: 'POST',
@@ -266,31 +255,28 @@
                     window.location.href = '/';
                 } else {
                     alert(response.message || 'Emergency Declaration Failed. Please try again.');
-                    
                 }
             }
             catch (err) {
                 console.error(err);
             }
 
-
-
         });
 
+        //effect of user clicking on emergency or non-emergency on report form
         const emergencyOption = document.getElementById('emergency_option');
         const nonEmergencyOption = document.getElementById('non_emergency_option');
         const emergencyFeedback = document.getElementById('emergencyFeedback');
-        
         function updateFeedback() {
-        if (emergencyOption.checked) {
-            emergencyFeedback.textContent = 'These threats involve police & are taken seriously.';
-            emergencyFeedback.style.color = 'red';
-        } else if (nonEmergencyOption.checked) {
-            emergencyFeedback.textContent = 'You are reporting a non-immediate emergency below.';
-            emergencyFeedback.style.color = 'orange';
-        } else {
-            emergencyFeedback.textContent = ''; // Clear feedback if neither is selected
-        }
+            if (emergencyOption.checked) {
+                emergencyFeedback.textContent = 'These threats involve police & are taken seriously.';
+                emergencyFeedback.style.color = 'red';
+            } else if (nonEmergencyOption.checked) {
+                emergencyFeedback.textContent = 'You are reporting a non-immediate emergency below.';
+                emergencyFeedback.style.color = 'orange';
+            } else {
+                emergencyFeedback.textContent = ''; // Clear feedback if neither is selected
+            }
         }
         emergencyOption.addEventListener('change', updateFeedback);
         nonEmergencyOption.addEventListener('change', updateFeedback);

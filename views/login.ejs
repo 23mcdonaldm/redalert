@@ -29,57 +29,38 @@
     <button type="submit" class="btn btn-primary">Log In</button>
 </form>
 
-
     <%- include('./partials/footer.ejs') %>
 
-
     <script>
-
 
         const form = document.querySelector('form.registration');
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            
             const form = event.target;
-            
             const formData = new FormData(form);
             const data = {};
             formData.forEach((value, key) => {
                 data[key] = value;
-            });
-            
+            });     
             
             try {
-
                 const res = await fetch('/login', {
                     method: 'POST',
                     body: JSON.stringify({ username: data.username, password: data.password }),
                     headers: { 'Content-Type': 'application/json' }
                 })
-
                 const response = await res.json();
-
                 if (res.ok) {
                     alert(`User has logged in!`);
                     window.location.href = '/';  // Redirect to the main page
                 } else {
                     alert(response.message || 'Login failed. Please try again.');
                 }
-
             }
             catch (err) {
                 console.error(err);
             }
-            
-
         })
-
-
-
-
-
-
     </script>
-
 </body>
 </html>

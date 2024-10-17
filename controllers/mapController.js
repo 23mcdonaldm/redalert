@@ -41,13 +41,12 @@ module.exports.getUserList = async (req, res) => {
 
 module.exports.getSchoolCoordinates = async (req, res) => {
     const { school_uid } = req.body;
-    console.log("school_id in backend: " + (school_uid));
     try {
         const coordinateQuery = `SELECT ST_X(coordinates::geometry), ST_Y(coordinates::geometry) FROM school WHERE school_uid = '${school_uid}'`;
         const coordinates = await pool.query(coordinateQuery);
-        console.log("coordinates: " + JSON.stringify(coordinates.rows[0]));
         res.status(200).json(coordinates.rows[0]);
     } catch (err) {
+        console.log("couldnt get school coords: " + err);
         throw new Error("couldn't get school coordinates");
     }
     
@@ -56,12 +55,8 @@ module.exports.getSchoolCoordinates = async (req, res) => {
 module.exports.getLocationCoordinates = async (req, res) => {
     const { geom } = req.body;
     try {
-        console.log("getting location");
-        console.log(geom);
         const coordinateQuery = `SELECT ST_X(geom::geometry), ST_Y(geom::geometry) FROM geolocation WHERE location_uid = '${geom}'`;
         const coordinates = await pool.query(coordinateQuery);
-        console.log("returning:");
-        console.log(coordinates);
         res.status(200).json(coordinates);
     } catch (err) {
         throw new Error("couldn't get location coordinates");

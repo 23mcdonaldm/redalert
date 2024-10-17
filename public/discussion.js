@@ -13,7 +13,6 @@ async function loadDiscussionPosts() {
         body: JSON.stringify({ currentSort })
     });
     const posts = await response.json();
-    console.log("Posts: " + JSON.stringify(posts));
     
     renderPosts(posts);
     document.getElementById("loading").style.display = "none";

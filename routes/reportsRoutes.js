@@ -5,11 +5,9 @@ const { requireAdminAuth, requireAuth } = require('../middleware/authMiddleware'
 
 const router = Router();
 
-router.post('/report', reportsController.report);
+router.post('/report', reportsController.postReport);
 
-router.get('/report', requireAuth, (req, res) => {
-    res.render('report', { user: res.locals.user });
-})
+router.get('/report', requireAuth, reportsController.getReport);
 
 
 module.exports = router;

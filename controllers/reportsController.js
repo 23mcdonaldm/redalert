@@ -1,11 +1,12 @@
 const pool = require('../dbms/database');
 
+module.exports.getReport = (req, res) => {
+    res.render('report', { user: res.locals.user });
+}
 
-module.exports.report = async (req, res) => {
+module.exports.postReport = async (req, res) => {
     let report = req.body;
-    console.log("report: " + JSON.stringify(report));
     const posInput = 'Point(' + report.geom.lng + ' ' + report.geom.lat + ')';
-    console.log(posInput);
     try {
         let insertQuery;
         if(report.location_type == "no_location_option") {

@@ -16,10 +16,7 @@ router.get('/discussion/:uuid', async (req, res) => {
     try {
         const discussion = await (discussionController.getDiscussionByUUID(uuid));
         const discussion_post = discussion.post;
-        console.log(discussion_post);
         const user = await api.fetchUserData(discussion_post.person_uid);
-        console.log("USER:" + JSON.stringify(user));
-        console.log("Discussion post: " + JSON.stringify(discussion_post));
         if (!discussion.post) {
             return res.status(404).render('404');
           }

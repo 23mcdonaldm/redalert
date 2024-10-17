@@ -1,6 +1,6 @@
 const BASE_URL = 'http://localhost:3000';
 
-async function fetchUserTok() {
+const fetchUserTok = async function() {
     try {
         const response = await fetch('/getUserTok');
 
@@ -8,8 +8,6 @@ async function fetchUserTok() {
             throw new Error('Error getting user cookie data');
         }
         const data = await response.json();
-        console.log('User data: ', data);
-
         return data;
     } catch (err) {
         console.error('Failed to fetch data');
@@ -17,9 +15,8 @@ async function fetchUserTok() {
     }
 }
 
-async function fetchUserData(user_uid) {
+const fetchUserData = async function(user_uid) {
     try {
-        console.log("UID: " + user_uid);
         const response = await fetch(`${BASE_URL}/fetchUserData/${user_uid}`);
         if(!response.ok) {
             throw new Error('Error getting user details');

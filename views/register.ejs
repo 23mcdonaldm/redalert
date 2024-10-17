@@ -85,7 +85,6 @@
         <input type="text" id="position" name="position"><br>
     </div>
 
-    
     <button type="submit" class="btn btn-primary">Submit</button>
 </form>
 
@@ -95,9 +94,8 @@
     <script>
         let doesUsernameExist = false;
         
-
+        //checks if username exists as user types
         async function checkUsername(username) {
-
             const feedback = document.getElementById('usernameFeedback');
             if (!username) {
                 feedback.textContent = '';
@@ -106,7 +104,7 @@
             try {
                 const usernameCheck = await fetch(`/check-username?username=${encodeURIComponent(username)}`);
                 doesUsernameExist = await usernameCheck.json();
-                
+                //updates feedback for user to see
                 if (doesUsernameExist.exists) {
                     feedback.textContent = 'Username is already taken';
                     feedback.style.color = 'red';
@@ -120,7 +118,6 @@
                 doesUsernameExist = false;
                 console.error(err);
             }
-            
         }
 
 
@@ -141,7 +138,7 @@
                 }
             });
         });
-        
+        //prevents default to check values first
         const form = document.querySelector('form.registration');
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -153,24 +150,20 @@
             formData.forEach((value, key) => {
                 data[key] = value;
             });
-            
-            
-            
+            //checks password length
             if (data.password.length < 8) {
                 alert("Password must be at least 8 characters long.");
                 return;
             }
 
-            
+            //checks if username available
             try {
                 await checkUsername(data.username);
                 if(doesUsernameExist.exists) {
                     alert("Username is already taken.");
                     return;
                 }
-                
-            
-
+                //posts data to register user
                 const res = await fetch('/register', {
                     method: 'POST',
                     body: JSON.stringify(data),
@@ -190,11 +183,7 @@
             catch (err) {
                 console.error(err);
             }
-            
-
         })
-        
-        
     </script>
     
 </body>
