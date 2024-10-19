@@ -9,6 +9,7 @@ router.get('/map/administrator', requireAdminAuth, (req, res) => mapController.a
 router.get('/getUserList', mapController.getUserList);
 router.post('/getSchoolCoordinates', mapController.getSchoolCoordinates); 
 router.post('/getLocationCoordinates', mapController.getLocationCoordinates);
+router.get('/getUsersandLocations', mapController.getUsersandLocations)
 
 
 module.exports = router;

@@ -89,7 +89,7 @@ initMap();
 
 async function mapUsers() {
     try {
-        const response = await fetch('/getUserList');
+        const response = await fetch('/getUsersandLocations');
         const geolocations = await response.json();
         const userList = document.getElementById("user-list");   
         const promises = geolocations.map(async geo => {
@@ -99,8 +99,7 @@ async function mapUsers() {
                 const formattedDate = date.toISOString().split('T')[0];
                 const li = document.createElement('li');
                 li.className = "list-group-item";
-                const curr_student = await fetchUserData(geo.student_uid);
-                li.textContent = `${curr_student.username} - Status: ${geo.status}\n${curr_student.name}\n${formattedDate}`;
+                li.textContent = `${geo.username} - Status: ${geo.status}\n${geo.name}\n${formattedDate}`;
         
                 if (geo.status === 'Safe') {
                     li.style.color = 'green';
@@ -125,7 +124,7 @@ async function mapUsers() {
                     currentInfoWindow = markers[geo.student_uid].infoWindow;
                 });
                 
-                await mapGeomLoc(curr_student, geo);
+                await mapGeomLoc(geo);
                 userList.appendChild(li);
             }
         });
@@ -140,7 +139,7 @@ async function mapUsers() {
 
 const markers = {};
 
-async function mapGeomLoc(student, geo) {
+async function mapGeomLoc(geo) {
     const markerLibrary = await google.maps.importLibrary("marker");
     PinElement = markerLibrary.PinElement;
     
@@ -183,7 +182,7 @@ async function mapGeomLoc(student, geo) {
 
     
     const currLocationMarkerIW = new google.maps.InfoWindow({
-        content: `Student Info: Name: ${student.name}, Phone: ${student.phone_number}, Email: ${student.email}`
+        content: `Student Info: Name: ${geo.name}, Phone: ${geo.phone_number}, Email: ${geo.email}`
     });
     
     markers[geo.student_uid] = {

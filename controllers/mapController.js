@@ -39,6 +39,21 @@ module.exports.getUserList = async (req, res) => {
     }
 }
 
+module.exports.getUsersandLocations = async (req, res) => {
+    
+    try {
+        const insertQuery = `SELECT g.location_uid, g.student_uid, g.timestamp, g.geom, g.status, 
+                            p.person_uid, p.name, p.username, p.phone_number, p.email FROM public.geolocation g 
+                            JOIN public.person p ON g.student_uid = p.person_uid`;
+        const result = await pool.query(insertQuery);
+        res.json(result.rows);
+    } catch(err) {
+        console.error("Error fetching user list: " + err);
+        throw new Error('Couldnt get user list');
+    }
+}
+
+
 module.exports.getSchoolCoordinates = async (req, res) => {
     const { school_uid } = req.body;
     try {
