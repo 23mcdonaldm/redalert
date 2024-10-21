@@ -12,7 +12,7 @@ router.get('/check-username', authController.check_username);
 router.get('/logout', authController.logout_get);
 router.get('/getUserTok', authController.getUserTok);
 router.get(`/fetchUserData/:user_uid`, authController.getUserData);
-router.get('/dashboard', requireAuth, authController.dashboard_get);
+router.get('/dashboard', requireAuth, authController.dashboard_get); //can we add a check that if its an admin searching, redirects them to /dashboard???
 router.get('/admin/dashboard', requireAdminAuth, authController.admin_dashboard_get);
 
 module.exports = router;

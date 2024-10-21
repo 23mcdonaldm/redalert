@@ -52,18 +52,34 @@ body {
 .imageandcontent {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: stretch; /* Aligns the elements to fill the container height */
     gap: 40px;
     padding: 40px;
     max-width: 95%;
     margin: 0 auto;
-    height: 90vh; /* Ensure the container fills most of the viewport */
+    height: 90vh;
 }
 
 .left-content, .right-content {
     flex: 1;
     min-width: 300px;
-    height: 100%; /* Ensure content sections fill their containers */
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Centers content vertically */
+    height: 100%;
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .imageandcontent {
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .left-content, .right-content {
+        width: 100%;
+    }
 }
 
 .right-content {
@@ -74,21 +90,22 @@ body {
 }
 
 .hero-image, .countdown-container {
-    background-color: #ffffff;
+    height: 100%; /* Ensure they both fill their container */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.countdown-container {
+    background-color: #ffffff; /* Match with the hero image box */
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    flex: 1; /* Ensure these elements share space evenly */
     text-align: center;
+    flex: 1;
 }
 
-.countdown-container {
-    background-color: transparent;
-    text-align: center;
-    padding: 10px;
-    margin: 0 auto;
-    max-width: 800px; /* Adjust this to fit your layout */
-}
 
 .countdown {
     display: flex;
@@ -133,4 +150,132 @@ body {
 
 .arrow:focus {
     outline: none;
+}
+
+
+.polls-section {
+    background-color: #1c1e21;
+    color: #f1f1f1;
+    padding: 60px 0;
+}
+
+.heading-black {
+    font-size: 2.5rem;
+    color: #ffffff;
+    font-weight: bold;
+}
+
+.text-muted {
+    color: #b0b3b8;
+    margin-bottom: 20px;
+}
+
+.card-custom {
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    text-align: center;
+}
+
+.btn-custom {
+    background-color: #ffffff;
+    color: #000000;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    width: 100%;
+    border-radius: 8px;
+    font-weight: bold;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.btn-custom:hover {
+    background-color: #f0f0f0;
+    color: #000000;
+}
+
+@media (max-width: 768px) {
+    .polls-section {
+        padding: 40px 20px;
+    }
+
+    .card-custom {
+        margin-bottom: 20px;
+    }
+}
+
+.polls-container {
+    display: flex;
+    justify-content: center; /* Centers the cards horizontally */
+    align-items: center; /* Centers the cards vertically if container is taller */
+    flex-wrap: wrap; /* Allows cards to wrap to new lines */
+    gap: 20px; /* Space between cards */
+    padding: 20px; /* Adjust the space around the polls */
+}
+.poll-card {
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    text-align: center;
+    flex: 0 1 300px; /* Cards will be at least 300px wide but will adjust if there's space */
+    max-width: 100%; /* Prevents overflow */
+}
+
+.waitlist-section {
+    background-color: #333;
+    padding: 75px;
+    padding-bottom: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.waitlist-content {
+    max-width: 600px;
+    width: 100%;
+    padding: 20px;
+}
+
+.waitlist-section h2 {
+    font-size: 1.5rem;
+    color: #f8f9fa;
+    margin-bottom: 20px;
+}
+
+.waitlist-form {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 10px;
+    justify-content: center;
+}
+
+.email-input {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 25px;
+    outline: none;
+    max-width: 300px;
+}
+
+.email-input::placeholder {
+    color: #999;
+}
+
+.join-button {
+    padding: 10px 20px;
+    border-radius: 25px;
+    background-color: #007bff;
+    border: none;
+    transition: background-color 0.3s;
+}
+
+.join-button:hover {
+    background-color: #0056b3;
+    color: #f8f9fa;
+    cursor: pointer;
+}
+.pollandemailinput {
+    min-height: 100vh; /* Ensures the entire container takes up at least the full viewport height */
 }

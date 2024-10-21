@@ -42,7 +42,6 @@
             formData.forEach((value, key) => {
                 data[key] = value;
             });     
-            
             try {
                 const res = await fetch('/login', {
                     method: 'POST',
@@ -51,8 +50,10 @@
                 })
                 const response = await res.json();
                 if (res.ok) {
+                    console.log(data);
                     alert(`User has logged in!`);
-                    window.location.href = '/';  // Redirect to the main page
+                    window.location.href = '/dashboard';  // Redirect to the main page
+                     
                 } else {
                     alert(response.message || 'Login failed. Please try again.');
                 }
