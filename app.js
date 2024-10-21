@@ -28,7 +28,7 @@ app.get('*', checkUser);
 
 //landing page, for now
 app.get('/', (req, res) => {
-    res.render('layout');
+    res.render('landingPage');
 })
 
 

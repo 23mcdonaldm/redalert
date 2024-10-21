@@ -1,0 +1,136 @@
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f6fb;
+    color: #333;
+    height: 100vh; /* Ensure the body takes up the full height of the viewport */
+}
+
+.hero {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+    padding: 80px 40px;
+    border-radius: 10px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    height: 100%; /* Make hero content fill the height */
+}
+
+.hero-content h1 {
+    font-size: 3.5rem;
+    font-weight: bold;
+    margin-bottom: 1.5rem;
+}
+
+.hero-content p {
+    font-size: 1.25rem;
+    margin-bottom: 2rem;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.hero-buttons .btn {
+    background-color: #ffffff;
+    color: #007bff;
+    padding: 0.75rem 2rem;
+    border-radius: 30px;
+    border: 2px solid #ffffff;
+    font-weight: bold;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.hero-buttons .btn:hover {
+    background-color: #0056b3;
+    color: #ffffff;
+    border-color: #0056b3;
+}
+
+.imageandcontent {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 40px;
+    padding: 40px;
+    max-width: 95%;
+    margin: 0 auto;
+    height: 90vh; /* Ensure the container fills most of the viewport */
+}
+
+.left-content, .right-content {
+    flex: 1;
+    min-width: 300px;
+    height: 100%; /* Ensure content sections fill their containers */
+}
+
+.right-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    height: 100%;
+}
+
+.hero-image, .countdown-container {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    flex: 1; /* Ensure these elements share space evenly */
+    text-align: center;
+}
+
+.countdown-container {
+    background-color: transparent;
+    text-align: center;
+    padding: 10px;
+    margin: 0 auto;
+    max-width: 800px; /* Adjust this to fit your layout */
+}
+
+.countdown {
+    display: flex;
+    align-items: center;
+    gap: 25px; /* Increase gap for even spacing */
+    justify-content: center;
+}
+
+.countdown > div {
+    text-align: center;
+}
+
+.container-day h3,
+.container-hour h3,
+.container-minute h3,
+.container-second h3 {
+    font-size: 2rem; /* Adjusted size */
+    font-weight: bold;
+    color: #333;
+    margin: 0;
+}
+
+.countdown h3 + h3 {
+    font-size: 1.1rem; /* Adjust size for the labels */
+    font-weight: bold;
+    margin-top: 5px;
+    color: #555;
+}
+
+.arrow {
+    background: none;
+    color: #333;
+    border: none;
+    cursor: pointer;
+    font-size: 2rem; /* Size to match the screenshot */
+    transition: color 0.3s ease;
+}
+
+.arrow:hover {
+    color: #007bff; /* Add a slight hover effect */
+}
+
+.arrow:focus {
+    outline: none;
+}

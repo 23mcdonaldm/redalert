@@ -46,6 +46,15 @@ module.exports.login_get = (req, res) => {
     res.render('login');
 }
 
+module.exports.dashboard_get = (req, res) => {
+    res.render('dashboard');
+}
+
+module.exports.admin_dashboard_get = (req, res) => {
+    res.render('adminDashboard');
+}
+
+
 //user registering
 module.exports.login_post = async (req, res) => {
     
