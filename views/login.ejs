@@ -14,7 +14,7 @@
 
 <form class="registration container mt-5 p-4 border rounded" action="/login" method="POST">
     
-    <label for="login" class="form-label">Log In User</label>
+    <label class="form-label">Log In User</label>
         
     <div class="mb-3">
         <label for="username" class="form-label">Username</label>
@@ -31,8 +31,9 @@
 
     <%- include('./partials/footer.ejs') %>
 
+    <script src="/socket.io/socket.io.js"></script>
     <script>
-
+        const socket = io();
         const form = document.querySelector('form.registration');
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -49,10 +50,18 @@
                     headers: { 'Content-Type': 'application/json' }
                 })
                 const response = await res.json();
+                console.log("RESPONSE: " + JSON.stringify(response));
+                const user_uid = response.user_uid;
+                const school_uid = response.school_uid;
+                const user_type = response.user_type;
                 if (res.ok) {
-                    console.log(data);
                     alert(`User has logged in!`);
-                    window.location.href = '/dashboard';  // Redirect to the main page
+                    //window.location.href = '/dashboard';  // Redirect to the main page
+                    console.log(user_uid);
+                    console.log(school_uid);
+                    console.log(user_type);
+                    socket.emit('login', { user_uid, school_uid, user_type });
+                    
                      
                 } else {
                     alert(response.message || 'Login failed. Please try again.');
@@ -62,6 +71,8 @@
                 console.error(err);
             }
         })
+
+        
     </script>
 </body>
 </html>

@@ -14,7 +14,9 @@
     "path": "^0.12.7",
     "pg": "^8.12.0",
     "qs": "^6.13.0",
-    "uuid": "^10.0.0"
+    "socket.io": "^4.8.0",
+    "uuid": "^10.0.0",
+    "ws": "^8.18.0"
   },
   "name": "hcd-ids",
   "description": "a project for hcd we will get an A",

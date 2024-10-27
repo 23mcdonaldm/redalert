@@ -1,5 +1,6 @@
 const pool = require('../dbms/database');
 
+
 module.exports.getReport = (req, res) => {
     res.render('report', { user: res.locals.user });
 }
@@ -23,6 +24,17 @@ module.exports.postReport = async (req, res) => {
         }
         
         await pool.query(insertQuery);
+
+        if (report.emergency && req.user_type == 'administrator') {
+            broadcastEmergency(req.socket, {
+                school_uid: report.school_uid,
+                event_type: report.event_type,
+                description: report.description,
+                geom: report.geom,
+                location_type: report.location_type
+            })
+        }
+
         res.status(200).json({ message: 'Report logged successfully' });
     } catch (err) {
         console.error('Error logging report to database', err);
@@ -30,4 +42,8 @@ module.exports.postReport = async (req, res) => {
 
     }
     
+}
+
+const broadcastEmergency = (socket, emergencyData) => {
+    io.emit('emergencyDeclared', emergencyData);
 }

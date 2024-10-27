@@ -67,7 +67,10 @@ module.exports.login_post = async (req, res) => {
         const logged_in_user = await login(user);
         const user_token = createToken(logged_in_user);
         res.cookie('jwt', user_token, { maxAge: maxAge * 1000}); //TODO : add in secure requirement eventually
-        res.status(200).json({ message: "User has logged in!" });
+        const user_type = logged_in_user.user_type;
+        const school_uid = logged_in_user.school_uid;
+        const user_uid = logged_in_user.user_uid;
+        res.status(200).json({ message: "User has logged in!", user_uid, school_uid, user_type });
     } catch (err) {
         console.error("Login Error: ", err);
         res.status(400).json({ message: "Error, " + err.message + ".", error: err.message });
@@ -87,7 +90,9 @@ const login = async (user) => {
             if (auth) {
                 const user_uid = result.rows[0].person_uid;
                 const user_type = result.rows[0].user_type;
-                return { user_uid, user_type };
+                const school_uid = result.rows[0].school_uid;
+
+                return { user_uid, user_type, school_uid };
             } else {
                 throw new Error("incorrect password");
             }
@@ -252,6 +257,20 @@ module.exports.getUserData = async (req, res) => {
     
     try {
         const result = await pool.query(`SELECT * FROM person WHERE person_uid = '${user_uid}'`);
+        if( result.rows.length > 0) {
+            res.json(result.rows[0]);
+        } else {
+            res.status(404).json({ error: 'User not found' });
+        }
+    } catch (err) {
+        console.log("couldnt get user data" + err);
+        res.status(500).json({ error: 'Database query failed' });
+    }
+}
+
+const getUserFromUsername = async function (username) {
+    try {
+        const result = await pool.query(`SELECT * FROM person WHERE person_uid = '${username}'`);
         if( result.rows.length > 0) {
             res.json(result.rows[0]);
         } else {

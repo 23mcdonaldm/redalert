@@ -1,13 +1,14 @@
 const { Router } = require('express');
 const discussionController = require('../controllers/discussionController');
 const api = require('../utils/api.js');
+const { requireAuth, checkUser , requireAdminAuth } = require('../middleware/authMiddleware');
 
 const BASE_URL = 'http://localhost:3000';
 const router = Router();
 
 router.post(`/getDiscussionPosts`, discussionController.getDiscussionPosts);
 
-router.get('/discussion', (req, res) => {
+router.get('/discussion', requireAuth, (req, res) => {
     res.render('discussion');
 })
 
