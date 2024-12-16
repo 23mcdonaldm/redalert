@@ -2,7 +2,7 @@ let currentTargetIndex = 0;
 
     
     const targetDates = [
-      new Date('October 14, 2024 00:00:00'),
+      new Date('November 18, 2024 00:00:00'),
         new Date('November 22, 2024 8:00:15'),
         new Date('December 15, 2024 12:00:00'),
         new Date('March 14, 2025 00:00:00'),

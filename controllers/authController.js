@@ -1,6 +1,9 @@
 const pool = require('../dbms/database');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const passport = require('passport');
+const LocalStrategy = require('passport-local');
+const crypto = require('crypto');
 
 
 
@@ -47,11 +50,27 @@ module.exports.login_get = (req, res) => {
 }
 
 module.exports.dashboard_get = (req, res) => {
-    res.render('dashboard');
+    const data = {
+        // Assuming you're using Passport.js or similar for authentication
+        emergency: true, // Set to true if there's an active emergency
+        notifications: null /* array of notification objects */,
+        messages: null/* array of message objects */,
+        discussions: null/* array of discussion objects */
+      };
+    
+    res.render('dashboard', data);
 }
 
 module.exports.admin_dashboard_get = (req, res) => {
-    res.render('adminDashboard');
+    const data = {
+        // Assuming you're using Passport.js or similar for authentication
+        emergency: false, // Set to true if there's an active emergency
+        notifications: null /* array of notification objects */,
+        messages: null/* array of message objects */,
+        discussions: null/* array of discussion objects */
+      };
+    
+    res.render('adminDashboard', data);
 }
 
 
