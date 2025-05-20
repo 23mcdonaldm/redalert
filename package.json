@@ -1,5 +1,7 @@
 {
   "dependencies": {
+    "@apollo/server": "^4.11.2",
+    "@apollo/subgraph": "^2.9.3",
     "@googlemaps/js-api-loader": "^1.16.8",
     "axios": "^1.7.4",
     "bcrypt": "^5.1.1",
@@ -8,6 +10,8 @@
     "dotenv": "^16.4.5",
     "ejs": "^3.1.10",
     "express": "^4.19.2",
+    "graphql": "^16.10.0",
+    "graphql-tag": "^2.12.6",
     "i": "^0.3.7",
     "jsonwebtoken": "^9.0.2",
     "npm": "^10.8.2",

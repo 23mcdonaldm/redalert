@@ -160,7 +160,7 @@ async function mapGeomLoc(geo) {
 
     
     const pinBackground = {
-        background: geo.status === 'Safe' ? "#1fa012" : "red",
+        background: geo.status === 'Safe' ? "#1fa012" : "#e61f27",
         scale: 1.5,
         glyphColor: geo.status === 'Safe' ? "white" : undefined, // Only set glyphColor if status is 'Safe'
         borderColor: geo.status === 'Safe' ? "white" : undefined // Only set borderColor if status is 'Safe'
